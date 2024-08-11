@@ -1,50 +1,43 @@
 #!/usr/bin/python3
-"""
-A script that converts Markdown to HTML.
-"""
-
+'''
+A script that codes markdown to HTML
+'''
 import sys
 import os
 import re
 
-def convert_markdown_to_html(input_file, output_file):
-    """
-    Converts a Markdown file to HTML and writes the output to a file.
-    """
-    # Check that the Markdown file exists and is a file
-    if not (os.path.exists(input_file) and os.path.isfile(input_file)):
-        print(f"Missing {input_file}", file=sys.stderr)
+if __name__ == '__main__':
+
+    # Test that the number of arguments passed is 2
+    if len(sys.argv[1:]) != 2:
+        print('Usage: ./markdown2html.py README.md README.html',
+              file=sys.stderr)
         sys.exit(1)
 
-    # Read the Markdown file and convert it to HTML
-    with open(input_file, encoding="utf-8") as f:
-        html_lines = []
-        for line in f:
-            # Check for Markdown headings
-            match = re.match(r"^(#+) (.*)$", line)
-            if match:
-                heading_level = len(match.group(1))
-                heading_text = match.group(2)
-                html_lines.append(f"<h{heading_level}>{heading_text}</h{heading_level}>")
-            else:
-                html_lines.append(line.rstrip())
-
-    # Write the HTML output to a file
-    with open(output_file, "w", encoding="utf-8") as f:
-        f.write("\n".join(html_lines))
-
-if __name__ == "__main__":
-    # Check that the correct number of arguments were provided
-    if len(sys.argv) != 3:
-        print("Usage: ./markdown2html.py <input_file> <output_file>", file=sys.stderr)
-        sys.exit(1)
-
-    # Get the input and output file names from the command-line arguments
+    # Store the arguments into variables
     input_file = sys.argv[1]
     output_file = sys.argv[2]
 
-    # Convert the Markdown file to HTML and write the output to a file
-    convert_markdown_to_html(input_file, output_file)
+    # Checks that the markdown file exists and is a file
+    if not (os.path.exists(input_file) and os.path.isfile(input_file)):
+        print(f'Missing {input_file}', file=sys.stderr)
+        sys.exit(1)
 
-    # Exit with a successful status code
-    sys.exit(0)
+    with open(input_file, encoding='utf-8') as file_1:
+        html_content = []
+        md_content = [line[:-1] for line in file_1.readlines()]
+        for line in md_content:
+            heading = re.split(r'#{1,6} ', line)
+            if len(heading) > 1:
+                # Compute the number of the # present to
+                # determine heading level
+                h_level = len(line[:line.find(heading[1])-1])
+                # Append the html equivalent of the heading
+                html_content.append(
+                    f'<h{h_level}>{heading[1]}</h{h_level}>\n'
+                )
+            else:
+                html_content.append(line)
+
+    with open(output_file, 'w', encoding='utf-8') as file_2:
+        file_2.writelines(html_content)
